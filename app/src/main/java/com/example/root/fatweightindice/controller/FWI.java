@@ -45,12 +45,22 @@ public final class FWI {
      * @param sex
      * @return the profile that has been created
      */
-    public Profile service(String weight, String size, String age, Boolean sex ){
+    public Profile service(String weight, String size, String age, Boolean sex){
 
         Log.d("INFO", "****** service ********");
-        FWIComputation fwiComputation = new FWIComputation();
+        FWIComputation fwiComputation = new FWIComputation(this.context);
         Profile profile = fwiComputation.createProfile(convert(weight), convert(size), convert(age), sex==true ? 1 : 0);
         return profile;
+    }
+
+    /**
+     * This surcharget holds to treat the recovery of the last profile.
+     * @return
+     */
+    public Profile service(){
+        Log.d("INFO", "****** service' ********");
+        FWIComputation fwiComputation = new FWIComputation(this.context);
+        return fwiComputation.deserializeProfile();
     }
 
     /**

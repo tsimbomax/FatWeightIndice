@@ -22,12 +22,13 @@ public class MainActivity extends AppCompatActivity {
     private EditText txtSize;
     private EditText txtAge;
     private RadioButton rbMan;
+    private RadioButton rbWoman;
     private Button btnCompute;
     private ImageView imgFWI;
     private TextView txtComment;
 
-    private FWI fwi;
-    private Profile profile;
+    private FWI fwi = null;
+    private Profile profile = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,8 +48,12 @@ public class MainActivity extends AppCompatActivity {
         initParam();
         Log.d("INFO", "The layouts have been mapped in the application**************");
 
+        recoveryLastProfile();
+        Log.d("INFO", "The recovery process held **************");
+        display();
+
         listenerNewProfile();
-        }
+    }
 
     /**
      * This method initialize the layouts.
@@ -59,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
         txtSize = (EditText) findViewById(R.id.txtSize);
         txtAge = (EditText) findViewById(R.id.txtAge);
         rbMan = (RadioButton) findViewById(R.id.rbMan);
+        rbWoman = (RadioButton) findViewById(R.id.rbWoman);
         btnCompute = (Button) findViewById(R.id.btnCompute);
         imgFWI = (ImageView) findViewById(R.id.imgFWI);
         txtComment = (TextView) findViewById(R.id.txtComment);
@@ -81,9 +87,32 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
+     * It recovers the last profil and set some informations in the page, ie,
+     * weight, size, age and sex. The img and comment will be set by the display method.
+     */
+    private void recoveryLastProfile(){
+
+        this.fwi = FWI.getInstance(this);
+        this.profile = fwi.service();
+
+        if(this.profile == null)
+            return;
+
+        txtWeight.setText(profile.getWeight().toString());
+        txtSize.setText(profile.getSize().toString());
+        txtAge.setText(profile.getAge().toString());
+        if(profile.getSex() == 0)
+            rbWoman.setChecked(true);
+    }
+
+    /**
      * This method display the result of the computation of the F.W.I and the comment.
      */
     private void display(){
+
+        Log.d("INFO", "inside the display method **************");
+        if(profile == null)
+            return;
 
         String comment = profile.getComment();
 

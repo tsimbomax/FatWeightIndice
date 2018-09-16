@@ -1,8 +1,11 @@
 package com.example.root.fatweightindice.business;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.example.root.fatweightindice.bean.Profile;
+import com.example.root.fatweightindice.dao.DAOException;
+import com.example.root.fatweightindice.dao.Serializer;
 
 import java.util.Date;
 
@@ -13,14 +16,18 @@ public class FWIComputation {
     private static final int MIN_MAN = 10;
     private static final int MAX_MAN = 25;
 
-    private static String fileName = "fileFWI";
+    private String fileName = "fileFWI";
+    private Context context;
 
     /**
      * Unique and public constructor
      */
-    public FWIComputation(){
-
+    public FWIComputation(Context context){
+        this.context = context;
     }
+
+    //we can add a mutator for the field fileName,
+    //In order to generated dynamically many  serialization from the controller FWI.
 
     /**
      * This method create a new profile.
@@ -32,7 +39,45 @@ public class FWIComputation {
         Profile profile = new Profile(new Date(), weight, size, age, sex);
         computeFWI(profile);
         interprateFWI(profile);
+
+        /**
+         * Normally, we should serialize only the last profile and not every profile.
+         * To do that, we need to know how to treat the close software event.
+         * In this case we should comment the following call instruction method,
+         * and call the method directly from the controller FWI.
+         */
+        serializeProfile(profile);
+
         return profile;
+    }
+
+    /**
+     * Serialize an instance of Profile throught the calling of to the Serialize class.
+     * @param profile the instance that we want to be serialize.
+     */
+    public void serializeProfile(Profile profile){
+        Log.d("INFO", "****** serializeProfile ********");
+        try {
+            Serializer.serialized(this.fileName, profile, this.context);
+        } catch(DAOException e){
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Deserialize an instance the Profile throught the calling of to the Serialize class.
+     * @return Profile the profile that has been serialized later.
+     */
+    public Profile deserializeProfile(){
+        Log.d("INFO", "****** deserializeProfile ********");
+        Profile profile = null;
+        try{
+            profile = (Profile) Serializer.deserialized(this.fileName, this.context);
+        } catch (DAOException e){
+            e.printStackTrace();
+        } finally {
+            return profile;
+        }
     }
 
     /**
@@ -76,6 +121,4 @@ public class FWIComputation {
         }
         profile.setComment(comment);
     }
-
-
 }

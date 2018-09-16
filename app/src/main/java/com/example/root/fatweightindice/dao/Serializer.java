@@ -14,26 +14,24 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OptionalDataException;
 import java.io.StreamCorruptedException;
-import java.util.List;
 
 
 public abstract class Serializer {
 
-    private static final String FILE_NAME = "";
 
     /**
      * This method can be used to serialize any object
      * @param object It represent the object that should be serialize
      * @throws DAOException This exception is generated when an error occurs during the serialize process
      */
-    public void serialized(Object object, Context context) throws DAOException {
+    public static void serialized(String fileName, Object object, Context context) throws DAOException {
 
         FileOutputStream file = null;
         ObjectOutputStream oos = null;
 
         try{
             //opening the file as a writing mode ie. outputFile
-            file = new FileOutputStream(FILE_NAME);
+            file = context.openFileOutput(fileName, Context.MODE_PRIVATE);
 
             //opening of a stream (output stream, as the file corresponding file has been opened as OutputFile) on the file stream 'file'
             oos = new ObjectOutputStream(file);
@@ -44,16 +42,16 @@ public abstract class Serializer {
 
 
         } catch(FileNotFoundException e){
-
+            throw new DAOException("The file " + fileName + " was not found", e);
         } catch(InvalidClassException | NotSerializableException e){
-
+            throw new DAOException("The process fail to serialize the given object", e);
         } catch (IOException e){
-
+            throw new DAOException("An error occurs during the serialization", e);
         } finally{
             try {
                 closeResources(oos, file);
             }catch(IOException e){
-
+                throw new DAOException("The process fail to close the used resources", e);
             }
 
         }
@@ -64,7 +62,7 @@ public abstract class Serializer {
      * @return It return the object that have been serialize else null
      * @throws DAOException It throws an exception when an error occurs during the deserialize process
      */
-    public Object deserialized() throws DAOException {
+    public static Object deserialized(String fileName, Context context) throws DAOException {
 
         FileInputStream file = null;
         ObjectInputStream ois = null;
@@ -72,7 +70,7 @@ public abstract class Serializer {
 
         try{
             // opening the stream file
-            file = new FileInputStream(FILE_NAME);
+            file = context.openFileInput(fileName);
             // open the object stream
             ois = new ObjectInputStream(file);
 
@@ -80,16 +78,16 @@ public abstract class Serializer {
             object = ois.readObject();
 
         } catch(FileNotFoundException e){
-
+            throw new DAOException("The file " + fileName + " was not found", e);
         } catch(InvalidClassException | ClassNotFoundException | StreamCorruptedException | OptionalDataException e){
-
+            throw new DAOException("The process fail to deserialize the given object", e);
         } catch (IOException e){
-
+            throw new DAOException("An error occurs during the deserialization", e);
         } finally{
             try {
                 closeResources(ois, file);
             }catch(IOException e){
-
+                throw new DAOException("The process fail to close the used resources", e);
             } finally {
                 return object;
             }
