@@ -2,6 +2,8 @@ package com.example.root.fatweightindice.dao;
 
 import android.content.Context;
 
+import com.example.root.fatweightindice.bean.Profile;
+
 import static com.example.root.fatweightindice.dao.DOAUtility.*;
 
 import java.io.FileInputStream;
@@ -14,18 +16,33 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OptionalDataException;
 import java.io.StreamCorruptedException;
+import java.util.List;
 
 
-public abstract class Serializer {
+public class ProfileDAOSerialize implements ProfileDAO {
+
+
+    private String fileName = null;
+    private Context context = null;
 
     /**
-     * This method can be used to serialize any object
-     * @param fileName the name of the file where the object is going to be serialized
-     * @param object It represent the object that should be serialize
-     * @param context the context of the application, which is useful to localising the path.
+     * public constructor, instanced an implementation of the ProfileDao interface.
+     * @param fileName the name of the file where the object is going to be serialized/deserialized
+     * @param context the one of the application used to locating paths to the database.
+     */
+    public ProfileDAOSerialize(String fileName, Context context){
+
+        this.fileName = fileName;
+        this.context = context;
+    }
+
+    /**
+     * This method can be used to serialize a Profile's instance.
+     * @param profile the instance of Profile that should be serialize
      * @throws DAOException This exception is generated when an error occurs during the serialize process
      */
-    public static void serialized(String fileName, Object object, Context context) throws DAOException {
+    @Override
+    public void saveProfile(Profile profile) throws DAOException {
 
         FileOutputStream file = null;
         ObjectOutputStream oos = null;
@@ -38,7 +55,7 @@ public abstract class Serializer {
             oos = new ObjectOutputStream(file);
 
             // serialization
-            oos.writeObject(object);
+            oos.writeObject(profile);
             oos.flush();
 
 
@@ -59,17 +76,16 @@ public abstract class Serializer {
     }
 
     /**
-     *This method is used to deserialize any object that has been previously serialized.
-     * @param fileName the name of the file where the object is going to be deserialized
-     * @param context the context of the application, which is useful to localising the path.
-     * @return It return the object that have been serialize else null
+     *This method is used to deserialize any profile that has been previously serialized.
+     * @return It return the Profile's instance that have been serialize else null
      * @throws DAOException It throws an exception when an error occurs during the deserialize process
      */
-    public static Object deserialized(String fileName, Context context) throws DAOException {
+    @Override
+    public Profile getProfile() throws DAOException {
 
         FileInputStream file = null;
         ObjectInputStream ois = null;
-        Object object = null;
+        Profile profile = null;
 
         try{
             // opening the stream file
@@ -78,7 +94,7 @@ public abstract class Serializer {
             ois = new ObjectInputStream(file);
 
             //deserialization
-            object = ois.readObject();
+            profile = (Profile)ois.readObject();
 
         } catch(FileNotFoundException e){
             throw new DAOException("The file " + fileName + " was not found", e);
@@ -92,9 +108,19 @@ public abstract class Serializer {
             }catch(IOException e){
                 throw new DAOException("The process fail to close the used resources", e);
             } finally {
-                return object;
+                return profile;
             }
         }
+    }
+
+    /**
+     * Read all instances of Profile in the serialization file(s). It has not yet been implemented.
+     * @return the list of profile that have been serialized.
+     * @throws DAOException is generated when an error occurs during the reading in the file of serialization.
+     */
+    @Override
+    public List<Profile> getProfiles() throws DAOException{
+        return null;
     }
 
 }

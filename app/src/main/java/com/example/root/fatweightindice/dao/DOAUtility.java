@@ -1,5 +1,7 @@
 package com.example.root.fatweightindice.dao;
 
+import android.database.Cursor;
+
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -31,6 +33,11 @@ public abstract class DOAUtility {
     public static void closeResource(ObjectInputStream ois) throws IOException{
         if(ois != null)
             ois.close();
+    }
+
+    public static void closeResource(Cursor cursor) {
+        if(cursor != null)
+            cursor.close();
     }
 
     public static void closeResources(ObjectOutputStream oos, FileOutputStream file) throws IOException{

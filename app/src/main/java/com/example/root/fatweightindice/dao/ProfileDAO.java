@@ -14,12 +14,11 @@ public interface ProfileDAO {
     public void saveProfile(Profile profile) throws DAOException;
 
     /**
-     * Read an instance of Profile in the database.
-     * @param object holds for information that will be use to find the profile in the database.
-     * @return Profile the instance that has been read in the database from the object.
+     * Read an instance of Profile in the database, the last stored one.
+     * @return Profile the last instance that has been stored in the database.
      * @throws DAOException is generated when an error occurs during the reading in the database.
      */
-    public Profile getProfile(Object object) throws DAOException;
+    public Profile getProfile() throws DAOException;
 
     /**
      * Read all instances of Profile in the database

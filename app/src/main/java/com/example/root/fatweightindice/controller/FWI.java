@@ -27,7 +27,7 @@ public final class FWI {
      */
     public static FWI getInstance(Context context){
 
-        Log.d("INFO", "****** getInstance* ********");
+        Log.d("INFO", "****** getInstance *********");
         if(fwi!=null){
             return fwi;
         } else {
@@ -60,7 +60,8 @@ public final class FWI {
     public Profile service(){
         Log.d("INFO", "****** service' ********");
         FWIComputation fwiComputation = new FWIComputation(this.context);
-        return fwiComputation.deserializeProfile();
+        //return fwiComputation.deserializeProfile();
+        return fwiComputation.getLastProfile();
     }
 
     /**
