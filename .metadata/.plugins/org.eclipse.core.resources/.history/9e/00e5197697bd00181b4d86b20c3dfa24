@@ -1,0 +1,77 @@
+package cm.fwi.dao;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Pool {
+
+    private static final int        NUM_CON = 3;
+    private static List<Connection> connections        = new ArrayList<Connection>();
+    private static List<Boolean> states = new ArrayList<Boolean>();
+    private static Pool pool = null;
+    
+    /**
+     * Private and unique constructor
+     * @param url to the database
+     * @param user username to used for the connection to the database
+     * @param password of the user to used for the connection to the database
+     * @throws PoolException
+     */
+    private Pool( String url, String user, String password ) throws PoolException {
+
+        for ( int i = 0; i < NUM_CON; i++ ) {
+            try {
+				Pool.connections.add(DriverManager.getConnection(url, user, password));
+			} catch (SQLException e) {
+				throw new PoolException("Fail to create a Poll", e);
+			}
+            states.add(true);
+        }
+    }
+    
+    public static Pool getInstance( String url, String user, String password ) throws PoolException{
+
+        if ( pool != null) {
+            return pool;
+        }
+        
+        Pool.pool =  new Pool( url, user, password );
+        return pool;
+        
+    }
+
+    public Connection getConnection() throws PoolException{
+
+    	for(int i=0; i<NUM_CON; i++) {
+    		if(states.get(i)) {
+    			states.set(i, false);
+    			return connections.get(i);
+    		}
+    	}
+        throw new PoolException("No free connection in the pooling connection");
+    }
+
+    public void deliverConnection( Connection connection ) throws PoolException{
+    	for(int i=0; i<NUM_CON; i++) {
+    		if(connections.get(i)==connection) {
+    			states.set(i, true);
+    		}
+    	}
+    	throw new PoolException("Can not delivery a connection which is not managed by the Pool instance");
+    }
+    
+    public void closeConnections() throws DAOException{
+    	states.clear();
+    	for(int i=0; i<NUM_CON; i++) {
+    		try {
+    			if(connections.get(i)!=null)
+    				connections.get(i).close();
+    		} catch(SQLException e) {
+    			throw new DAOException("The process fail to close the Pool", e);
+    		}
+    	}
+    }
+}

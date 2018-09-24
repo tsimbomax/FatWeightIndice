@@ -1,0 +1,112 @@
+package cm.fwi.business;
+
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import cm.fwi.beans.Profile;
+import cm.fwi.dao.DAOException;
+import cm.fwi.dao.DAOFactory;
+import cm.fwi.dao.ProfileDao;
+
+public class Model extends UtilBus{
+    
+    private static ProfileDao profileDao = null;
+    private static final String LAST_PRO = "profile";
+    private static final String RES = "result";
+    private static final String LIST_PRO = "profiles";
+    private static final String DATA = "data";
+
+    /**
+     * Unique and public constructor
+     * @param daoFactory the unique dao factory, used to get the specification/contract of the profileDao
+     */
+    public Model(DAOFactory daoFactory) {
+        Model.profileDao = daoFactory.getProfileDao();
+    }
+    
+    /**
+     * 
+     * @param request
+     */
+    public void saveProfile(HttpServletRequest request) {
+        
+        JSONArray jsonArray = null;
+        Date date ;
+        Integer weight = null ;
+        Integer size = null ;
+        Integer age = null;
+        Integer sex = null ;
+        Float fwi = null ;
+        String comment = null ;
+        try {
+            jsonArray = new JSONArray(request.getParameter( DATA ));
+            
+        } catch ( JSONException e ) {
+            setResult("Fail to open the JSON data; " + e.toString());
+        }
+
+        //date = (Date) jsonArray.get( 0 );
+        try {
+            weight = jsonArray.getInt( 1 );
+            size =  jsonArray.getInt( 2 );
+            age =  jsonArray.getInt( 3 );
+            sex = jsonArray.getInt( 4 );
+            fwi = (float)jsonArray.getDouble( 5 );
+            comment = jsonArray.getString( 6 );
+        } catch ( JSONException e ) {
+            setResult("error in parameters; " + e.toString());
+        }
+                
+        try {
+        Profile profile = new Profile(new Date(), weight, size, age, sex);
+        profile.setFwi(  fwi ) ;
+        profile.setComment( comment );
+        profileDao.createProfile( profile );
+        setResult("profile saves successfully");
+        } catch(DAOException e) {
+            setResult("an error occurs; "+ e.getMessage());
+        }
+    }
+    
+    /**
+     * 
+     * @param request
+     * @return
+     */
+    public Profile lastProfile(HttpServletRequest request) {
+        
+        try {
+            return profileDao.readProfile( 0l );
+        } catch(DAOException e) {
+            setResult("an error occurs; "+ e.getMessage());
+            return null;
+        } finally {
+            if(getResult().isEmpty())
+                setResult("succes");
+        }
+    }
+    
+    /**
+     * 
+     * @param request
+     * @return
+     */
+    public List<Profile> listProfiles(HttpServletRequest request){
+        
+        try {
+            return profileDao.listOfProfiles();
+        } catch(DAOException e) {
+            setResult("Fail to read the profiles's list from the database; " + e.toString());
+            return null;
+        } finally {
+            if(getResult().isEmpty())
+                setResult("succes");
+        }
+    }
+}

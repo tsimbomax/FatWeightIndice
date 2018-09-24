@@ -1,0 +1,17 @@
+DROP DATABASE IF EXISTS android_tp;
+CREATE DATABASE android_tp DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+USE android_tp;
+
+CREATE TABLE Profile (
+	id INTEGER NOT NULL AUTO_INCREMENT,
+	dte DATETIME NOT NULL,
+	weight INTEGER NOT NULL,
+	size INTEGER NOT NULL,
+	age INTEGER NOT NULL,
+	sex INTEGER NOT NULL,
+	fwi DOUBLE(5,2) NOT NULL,
+	comment VARCHAR( 32 ) NOT NULL,
+	PRIMARY KEY(id)
+) ENGINE = INNODB;
+
+GRANT ALL ON android_tp.* TO 'android'@'localhost';

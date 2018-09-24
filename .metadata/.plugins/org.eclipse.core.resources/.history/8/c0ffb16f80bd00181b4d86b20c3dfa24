@@ -1,0 +1,16 @@
+package cm.fwi.dao;
+
+import java.util.List;
+
+import com.sdzee.beans.Customer;
+
+public interface ProfileDao {
+
+    void createProfile( Profile profile ) throws DAOException;
+
+    Profile readProfile( Long id ) throws DAOException;
+
+    List<Profile> listOfProfiles() throws DAOException;
+
+    void deleteProfile( Long id ) throws DAOException;
+}

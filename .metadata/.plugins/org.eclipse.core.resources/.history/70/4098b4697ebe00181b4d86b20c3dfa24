@@ -1,0 +1,154 @@
+package cm.fwi.dao;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Properties;
+
+import com.jolbox.bonecp.BoneCP;
+import com.jolbox.bonecp.BoneCPConfig;
+
+public final class DAOFactory {
+
+    private static final String CONF_FILE_PRO    = "/cm/fwi/dao/dao.properties";
+    private static final String DRIVER_PRO       = "driver";
+    private static final String URL_PRO          = "url";
+    private static final String USER_PRO         = "user";
+    private static final String PASSWD_PRO       = "password";
+
+    /*
+     * // static here is not necessary, but more logic. private static String
+     * url; private static String user; private static String password;
+     */
+
+    /**
+     * the initialization here is a powerful artifact which help us to know
+     * whether an instance has already be created or no
+     */
+    private static Pool       poolingConnection   = null;
+    private static DAOFactory daoFactory = null;
+
+    /**
+     * This is the unique constructor declarated private, such that it's
+     * impossible to create an instance from outside. It takes one parameter.
+     * 
+     * @param poolingConnection
+     *            This holds for the connection pooling between the database and
+     *            objects
+     * 
+     */
+    private DAOFactory( Pool poolingConnection ) {
+        this.poolingConnection = poolingConnection;
+    }
+
+    /**
+     * This static method return the only instance of the DAOFactory. If it has
+     * already been instanciate, it do not have to create a new one. It create
+     * an instance if and only if any one does exist.
+     * 
+     * @return It return the unique instance of the DAOFactory.
+     * @throws DAOConfigurationException
+     *             Which is generate when the process fail to load the Driver or
+     *             read the connection data to the database.
+     */
+    public static DAOFactory getInstance() throws DAOConfigurationException {
+
+        // if an instance already exists, return it.
+        if ( poolingConnection != null ) {
+            return daoFactory;
+        }
+
+        String driver;
+        String url;
+        String user;
+        String password;
+
+        Properties properties = new Properties();
+        ClassLoader classLoader;
+        InputStream fileProStream;
+        Pool poolingConnection = null;
+
+        classLoader = Thread.currentThread().getContextClassLoader();
+        fileProStream = classLoader.getResourceAsStream( CONF_FILE_PRO );
+        if ( fileProStream == null ) {
+            throw new DAOConfigurationException( "The property file " + CONF_FILE_PRO + " is unfindable" );
+        }
+        try {
+            properties.load( fileProStream );
+        } catch ( IOException e ) {
+            throw new DAOConfigurationException( "The properties file " + CONF_FILE_PRO + " has an invalid syntax.",
+                    e );
+        }
+        driver = properties.getProperty( DRIVER_PRO );
+        if ( driver == null ) {
+            throw new DAOConfigurationException( "the property " + DRIVER_PRO + " was not found" );
+        }
+        url = properties.getProperty( URL_PRO );
+        if ( url == null ) {
+            throw new DAOConfigurationException( "the property " + URL_PRO + " was not found" );
+        }
+        user = properties.getProperty( USER_PRO );
+        if ( user == null ) {
+            throw new DAOConfigurationException( "the property " + USER_PRO + " was not found" );
+        }
+        password = properties.getProperty( PASSWD_PRO );
+        if ( password == null ) {
+            throw new DAOConfigurationException( "the property " + PASSWD_PRO + " was not found" );
+        }
+
+        try {
+            Class.forName( driver );
+        } catch ( ClassNotFoundException e ) {
+            throw new DAOConfigurationException( "The driver fail to load", e );
+        }
+
+        /*
+         * Configucation of the connection pooling throught the BoneCP library
+         * 
+         */
+        try {
+			poolingConnection = Pool.getInstance(url, user, password);
+		} catch (PoolException e) {
+			throw new DAOConfigurationException("The process fail to create the 'Pooling connection'", e);
+		}
+
+        daoFactory  = new DAOFactory( poolingConnection );
+        
+
+        return daoFactory;
+
+    }
+
+    /**
+     * Get a connection from the current Pool instance.
+     * @return a connection
+     */
+    public Connection getConnection() throws PoolException{
+
+        return poolingConnection.getConnection();
+
+    }
+    
+    /**
+     * This method deliver a connection to the pooling connection 
+     * @param connection which should be deliver to the pooling connection.
+     * @throws PoolException when a connection to be deliver is not manage by the pooling.
+     */
+    public void deliverConnection(Connection connection) throws PoolException{
+    	poolingConnection.deliverConnection(connection);
+    }
+    
+    public void closePool() {
+        poolingConnection.closeConnections();
+    }
+
+    /**
+     * Get the contract/interface/specification of the ProfileDao through is implementation.
+     * @return the interface of the ProfileDao
+     */
+    public ProfileDao getProfileDao() {
+
+        return new ProfileDaoImpl( this );
+    }
+}

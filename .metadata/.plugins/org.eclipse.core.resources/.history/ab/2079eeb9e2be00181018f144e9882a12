@@ -1,0 +1,64 @@
+package cm.fwi.servlets;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import cm.fwi.beans.Profile;
+import cm.fwi.business.Model;
+import cm.fwi.dao.DAOFactory;
+
+/**
+ * Servlet implementation class Controller
+ */
+@WebServlet("/fwi/profile")
+public class Controller extends HttpServlet {
+    
+    private static final String CONF_DAO_FACTORY = "daofactory";
+    private static final String OPERATION = "operation";
+    
+    private Model model = null;
+    
+    public void init() {
+        
+        this.model = new Model((DAOFactory)getServletContext().getAttribute( CONF_DAO_FACTORY ));
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+	    controle(request, response);
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	    controle(request, response);
+	}
+	
+	private void controle(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	    
+	    String operation = request.getParameter( OPERATION );
+	    if("saveProfile".equals( operation )) {
+	        model.saveProfile(request);
+	    }else if("lastProfile".equals( operation )) {
+	        Profile profile = model.lastProfile(request);
+	    } else if("listProfiles".equals( operation )) {
+	        model.listProfiles(request);
+	    }
+	    response.addHeader( "result", model.getResult() );
+	    response.setContentType( "text" );
+	    response.addHeader( "result2", model.getResult() );
+	    PrintWriter out = response.getWriter();
+	    out.print(operation + " % " + model.getResult());
+	}
+
+}

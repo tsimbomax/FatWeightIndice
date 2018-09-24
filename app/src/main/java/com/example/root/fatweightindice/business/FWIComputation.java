@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.example.root.fatweightindice.bean.Profile;
+import com.example.root.fatweightindice.controller.FWI;
 import com.example.root.fatweightindice.dao.DAOException;
 import com.example.root.fatweightindice.dao.DAOFactory;
 import com.example.root.fatweightindice.dao.ProfileDAO;
@@ -82,6 +83,20 @@ public class FWIComputation {
         } finally {
             return profile;
         }
+    }
+
+    /**
+     * This method is used as complement of the getLastProfile() method.
+     * As there we do not get the last profile but we have launched the process
+     * Then we will used this one to complete it from the profileDAOExtDB's implementation.
+     * @param context : This is the context of the MainActivity which has done the request for last profile.
+     * @param profile to recover from the getLastProfile() process.
+     */
+    public static void setProfile(Context context, Profile  profile){
+        // We put null for the context because the unique FWI instance has already been created
+        // and then contains the right context.
+        FWI fwi = FWI.getInstance();
+        fwi.setProfile(context, profile);
     }
 
     /**

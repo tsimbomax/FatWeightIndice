@@ -30,7 +30,9 @@ public class DAOFactory {
      * @return the contract of the ProfileDAO.
      */
     public ProfileDAO getProfileDAO(Context context){
-        return new ProfileDAOMySQLite(context);
+
+        //return new ProfileDAOMySQLite(context);
+        return new ProfileDAOExtDB(context);
     }
 
     /**

@@ -1,0 +1,16 @@
+package com.sdzee.dao;
+
+import java.util.List;
+
+import com.sdzee.beans.Customer;
+
+public interface CustomerDao {
+
+    void createCustomer( Customer customer ) throws DAOException;
+
+    Customer readCustomer( Long id ) throws DAOException;
+
+    List<Customer> listOfCustomers() throws DAOException;
+
+    void deleteCustomer( Long id ) throws DAOException;
+}

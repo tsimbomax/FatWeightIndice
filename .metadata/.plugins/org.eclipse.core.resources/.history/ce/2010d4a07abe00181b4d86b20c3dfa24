@@ -1,0 +1,49 @@
+package cm.fwi.servlets;
+
+import java.io.IOException;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import cm.fwi.business.Model;
+import cm.fwi.dao.DAOFactory;
+
+/**
+ * Servlet implementation class Controller
+ */
+@WebServlet("/fwi/profile")
+public class Controller extends HttpServlet {
+    
+    private static final String CONF_DAO_FACTORY = "daofactory";
+    
+    private Model model = null;
+    
+    public void init() {
+        
+        this.model = new Model((DAOFactory)getServletContext().getAttribute( CONF_DAO_FACTORY ));
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+	    controle(request, response);
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	    controle(request, response);
+	}
+	
+	private void controle(HttpServletRequest request, HttpServletResponse response) {
+	    
+	    String operation = request.getParameter( OPERATION );
+	    
+	}
+
+}

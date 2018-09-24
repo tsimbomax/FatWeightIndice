@@ -1,0 +1,7 @@
+package cm.fwi.listeners;
+
+import java.lang;
+
+public class CheckParam extends lang {
+
+}

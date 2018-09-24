@@ -6,32 +6,40 @@ import android.widget.EditText;
 
 import com.example.root.fatweightindice.bean.Profile;
 import com.example.root.fatweightindice.business.FWIComputation;
+import com.example.root.fatweightindice.view.MainActivity;
 
+/**
+ * It is very important to note that, the context could not be a field of this class;
+ * because (as a servlet) it will be instanciated at once, field's context will imply
+ * either same context/mainActivity for all user (what is absurd) or
+ * context/mainActivity interferences between client request when there is a setting instruction for the context.
+ * to increase the code beauty, we could try to store the context inside a "session" scope variable(as in servlet API).
+ * @author TSIMBO FOKOU
+ * @version 1.0
+ *
+ */
 public final class FWI {
 
-    private Context context;
     private static FWI fwi = null;
 
     /**
      * private constructor which make sure that an instance can not be create in every manner.
-     * @param context : the context of the application ie. the MainActivity.
      */
-    private FWI(Context context){
-        this.context = context;
+    private FWI(){
+        super();
     }
 
     /**
      * This method is used to have the unique instance of our controller.
-     * @param context : This is the context of the MainActivity
      * @return return the already create FWI or the created one else
      */
-    public static FWI getInstance(Context context){
+    public static FWI getInstance(){
 
         Log.d("INFO", "****** getInstance *********");
         if(fwi!=null){
             return fwi;
         } else {
-            fwi = new FWI(context);
+            fwi = new FWI();
             return fwi;
         }
     }
@@ -39,29 +47,43 @@ public final class FWI {
     /**
      * This is the method that is going to manage the work inside the controller FWI,
      * as a servlet in a Web App.
+     * @param context : This is the context of the MainActivity
      * @param weight
      * @param size
      * @param age
      * @param sex
      * @return the profile that has been created
      */
-    public Profile service(String weight, String size, String age, Boolean sex){
+    public Profile service(Context context, String weight, String size, String age, Boolean sex){
 
-        Log.d("INFO", "****** service ********");
-        FWIComputation fwiComputation = new FWIComputation(this.context);
+        //MainActivity main = (MainActivity)context;
+        // we can use it to access to the layouts
+        Log.d("INFO", "****** service "+context.toString()+"********");
+        FWIComputation fwiComputation = new FWIComputation(context);
         Profile profile = fwiComputation.createProfile(convert(weight), convert(size), convert(age), sex==true ? 1 : 0);
         return profile;
     }
 
     /**
      * This surcharget holds to treat the recovery of the last profile.
+     * @param context : This is the context of the MainActivity
      * @return
      */
-    public Profile service(){
-        Log.d("INFO", "****** service' ********");
-        FWIComputation fwiComputation = new FWIComputation(this.context);
+    public Profile service(Context context){
+        Log.d("INFO", "****** service' " + context.toString() +"********");
+        FWIComputation fwiComputation = new FWIComputation(context);
         //return fwiComputation.deserializeProfile();
         return fwiComputation.getLastProfile();
+    }
+
+    /**
+     *
+     * @param context
+     * @param profile
+     */
+    public void setProfile(Context context, Profile profile){
+        Log.d("INFO", "****** setProfile : FWI : " +context.toString()+" *********");
+        ((MainActivity)context).setProfile(profile);
     }
 
     /**

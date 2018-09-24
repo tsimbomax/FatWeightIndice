@@ -1,0 +1,90 @@
+package cm.fwi.business;
+
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import cm.fwi.beans.Profile;
+import cm.fwi.dao.DAOException;
+import cm.fwi.dao.DAOFactory;
+import cm.fwi.dao.ProfileDao;
+
+public class Model extends UtilBus{
+    
+    private static ProfileDao profileDao = null;
+    private static final String LAST_PRO = "profile";
+    private static final String RES = "result";
+    private static final String LIST_PRO = "profiles";
+
+    public Model(DAOFactory daoFactory) {
+        Model.profileDao = daoFactory.getProfileDao();
+    }
+    
+    public void saveProfile(HttpServletRequest request) {
+        
+        JSONArray jsonArray = null;
+        try {
+            jsonArray = new JSONArray(request.getParameter( "data" ));
+            
+        } catch ( JSONException e1 ) {
+            e1.printStackTrace();
+        }
+        try {
+        Date date = (Date) jsonArray.get( 0 );
+        Integer weight = (Integer) jsonArray.get( 1 );
+        Integer size = (Integer) jsonArray.get( 2 );
+        Integer age = (Integer) jsonArray.get( 3 );
+        Integer sex = (Integer) jsonArray.get( 4 );
+        Float fwi = (Float) jsonArray.get( 5 );
+        String comment = (String) jsonArray.get( 6 );
+        } catch(JSONException e) {
+            e.printStackTrace();
+        }
+        
+/*        String sdate = valueParam(request, "date");
+        String sWeight = valueParam(request, "weight");
+        String sSize = valueParam(request, "size");
+        String sAge = valueParam(request, "age");
+        String sSex = valueParam(request, "sex");
+        String sFwi = valueParam(request, "fwi");
+        String sComment = valueParam(request, "comment");
+*/        
+        try {
+        Profile profile = new Profile(new Date(), weight, size, age, sex);
+        profile.setFwi(  fwi ) ;
+        profile.setComment( comment );
+        profileDao.createProfile( profile );
+        setResult("profile saves successfully");
+        } catch(NumberFormatException e) {
+            setResult("error in parameter;");
+        } catch(DAOException e) {
+            setResult("an error occurs; "+ e.getMessage());
+        }
+    }
+    
+    public Profile lastProfile(HttpServletRequest request) {
+        
+        Profile profile = null;
+        
+        try {
+            profile = profileDao.readProfile( 0l );
+            setResult("succes");
+        } catch(DAOException e) {
+            setResult("an error occurs; "+ e.getMessage());
+        } finally {
+            request.setAttribute( LAST_PRO, profile );
+            request.setAttribute( RES, getResult() );
+            return profile;
+        }
+    }
+    
+    public List<Profile> listProfiles(HttpServletRequest request){
+        return null;
+        
+    }
+}

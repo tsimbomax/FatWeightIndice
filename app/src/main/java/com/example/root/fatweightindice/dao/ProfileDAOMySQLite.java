@@ -5,12 +5,12 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.os.Build;
-import android.support.annotation.RequiresApi;
 import android.util.Log;
 
 import com.example.root.fatweightindice.bean.Profile;
+import com.example.root.fatweightindice.business.DateUtil;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -50,7 +50,7 @@ public class ProfileDAOMySQLite implements ProfileDAO {
         } catch (SQLiteException e){
             throw new DAOException(e);
         }
-        String req = "INSERT INTO Profile (date, weight, size, age, sex) VALUES ('" + profile.getDate() + "', " + profile.getWeight() + ", "
+        String req = "INSERT INTO Profile (date, weight, size, age, sex) VALUES ('" + DateUtil.convertDateToString(profile.getDate()) + "', " + profile.getWeight() + ", "
                 + profile.getSize() + ", " + profile.getAge() + ", " + profile.getSex() + ");";
         try {
             dbManagement.execSQL(req);
@@ -79,12 +79,11 @@ public class ProfileDAOMySQLite implements ProfileDAO {
             throw new DAOException("the process fail to read a profile from the database");
         }
         if(cursor.moveToLast()){
-            Date date = new Date();
-            Integer weight = cursor.getInt(1);
-            Integer size = cursor.getInt(2);
-            Integer age = cursor.getInt(3);
-            Integer sex = cursor.getInt(4);
-            profile = new Profile(date, weight, size, age, sex);
+            try {
+                profile = map(cursor);
+            } catch (ParseException e) {
+                throw new DAOException("Error while parsing the date", e);
+            }
         }
         closeResource(cursor);
         return profile;
@@ -106,6 +105,24 @@ public class ProfileDAOMySQLite implements ProfileDAO {
         //the selectionArgs is used in case of prepared statement, ie, req with ?; see doc of rawQuery.
         cursor = dbManagement.rawQuery(req, null);
 
+        while(cursor.moveToNext()){
+            try {
+                profiles.add(map(cursor));
+            } catch (ParseException e) {
+                throw new DAOException("Error while parsing the date", e);
+            }
+        }
+        closeResource(cursor);
+        return profiles;
+    }
+
+    /**
+     * Map the actual data of the cursor into a profile
+     * @param cursor at a readable position
+     * @return the associate profile of cursor at its position
+     * @throws ParseException when error occurs during the date parse.
+     */
+    public Profile map(Cursor cursor) throws ParseException{
         Date date;
         Integer weight;
         Integer size;
@@ -113,16 +130,13 @@ public class ProfileDAOMySQLite implements ProfileDAO {
         Integer sex;
         Profile profile;
 
-        while(cursor.moveToNext()){
-            date = new Date(cursor.getString(1));
-            weight = cursor.getInt(2);
-            size = cursor.getInt(3);
-            age = cursor.getInt(4);
-            sex = cursor.getInt(5);
-            profile = new Profile(date, weight, size, age, sex);
-            profiles.add(profile);
-        }
-        closeResource(cursor);
-        return profiles;
+        date = DateUtil.convertStringToDate(cursor.getString(0));
+        weight = cursor.getInt(1);
+        size = cursor.getInt(2);
+        age = cursor.getInt(3);
+        sex = cursor.getInt(4);
+        profile = new Profile(date, weight, size, age, sex);
+
+        return profile;
     }
 }

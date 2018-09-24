@@ -1,0 +1,48 @@
+package cm.fwi.dao;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+public class Pool {
+
+    private static final int        NUM_CON = 3;
+    private static Map<Connection, Boolean> connections        = new HashMap<Connection, Boolean>();
+    private Iterator iterConnections;
+    
+    private Pool( String url, String user, String password ) throws SQLException {
+
+        for ( int i = 0; i < NUM_CON; i++ ) {
+            Pool.connections.put(DriverManager.getConnection(url, user, password), true);
+        }
+        Set <Map<Connection, Boolean>> entries = connections.entrySet();
+    }
+
+    public Connection getConnection() {
+
+    	
+        return connections.remove( connections.size() );
+    }
+
+    public void close( Connection connection ) {
+        connections.add( connection );
+    }
+
+    public Pool getInstance( String url, String user, String password ) {
+
+        if ( !connections.isEmpty() ) {
+            return new Pool();
+        }
+        try {
+            return new Pool( url, user, password );
+        } catch ( SQLException e ) {
+            throw new DAOException( "The process fail to create the connection pooling" );
+        }
+    }
+}

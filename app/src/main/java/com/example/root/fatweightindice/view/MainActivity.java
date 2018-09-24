@@ -48,7 +48,8 @@ public class MainActivity extends AppCompatActivity {
         initParam();
         Log.d("INFO", "The layouts have been mapped in the application**************");
 
-        recoveryLastProfile();
+        this.fwi = FWI.getInstance();
+        this.profile = fwi.service(this);
         Log.d("INFO", "The recovery process held **************");
         display();
 
@@ -79,30 +80,20 @@ public class MainActivity extends AppCompatActivity {
         btnCompute.setOnClickListener(new Button.OnClickListener(){
            public void onClick(View v){
                Log.d("INFO", "A click happen on the f.w.i computation button*************");
-               MainActivity.this.fwi = FWI.getInstance(MainActivity.this);
-               MainActivity.this.profile = fwi.service(txtWeight.getText().toString(), txtSize.getText().toString(), txtAge.getText().toString(), rbMan.isChecked());
+               MainActivity.this.fwi = FWI.getInstance();
+               MainActivity.this.profile = fwi.service(MainActivity.this,txtWeight.getText().toString(), txtSize.getText().toString(), txtAge.getText().toString(), rbMan.isChecked());
                display();
            }
         });
     }
 
     /**
-     * It recovers the last profil and set some informations in the page, ie,
-     * weight, size, age and sex. The img and comment will be set by the display method.
+     * This method set profile from outside and forced its displaying
+     * @param profile to be set and display
      */
-    private void recoveryLastProfile(){
-
-        this.fwi = FWI.getInstance(this);
-        this.profile = fwi.service();
-
-        if(this.profile == null)
-            return;
-
-        txtWeight.setText(profile.getWeight().toString());
-        txtSize.setText(profile.getSize().toString());
-        txtAge.setText(profile.getAge().toString());
-        if(profile.getSex() == 0)
-            rbWoman.setChecked(true);
+    public void setProfile(Profile profile){
+        this.profile = profile;
+        display();
     }
 
     /**
@@ -113,6 +104,12 @@ public class MainActivity extends AppCompatActivity {
         Log.d("INFO", "inside the display method **************");
         if(profile == null)
             return;
+
+        txtWeight.setText(profile.getWeight().toString());
+        txtSize.setText(profile.getSize().toString());
+        txtAge.setText(profile.getAge().toString());
+        if(profile.getSex() == 0)
+            rbWoman.setChecked(true);
 
         String comment = profile.getComment();
 

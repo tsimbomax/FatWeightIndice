@@ -1,0 +1,5 @@
+package cm.fwi.dao;
+
+public class PoolException extends RuntimeException {
+
+}

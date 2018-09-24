@@ -1,0 +1,4 @@
+driver = com.mysql.jdbc.Driver
+url = jdbc:mysql://localhost:3306/db_sdzee_tp?allowMultiQueries=true&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC&autoReconnect=true&useSSL=false
+user = java
+password = $dZ_&E

@@ -1,0 +1,7 @@
+INDEX VERSION 1.4+/home/tsimbo/AndroidStudioProjects/FatWeightIndice/.metadata/.plugins/org.eclipse.wst.jsdt.core/indexes
+1121624682.index
+2402556691.index
+3551943537.index
+144679473.index
+3546831269.index
+3192044017.index

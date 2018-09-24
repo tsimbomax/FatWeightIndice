@@ -1,0 +1,32 @@
+DROP DATABASE IF EXISTS db_sdzee_tp;
+CREATE DATABASE db_sdzee_tp DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+USE db_sdzee_tp;
+
+CREATE TABLE db_sdzee_tp.Customer (
+	id INT(11) NOT NULL AUTO_INCREMENT,
+	first_name VARCHAR(20) NOT NULL,
+	last_name VARCHAR(20),
+	adress VARCHAR(200) NOT NULL,
+	phone VARCHAR(20) NOT NULL,
+	email VARCHAR(60) NOT NULL,
+	picture VARCHAR(200),
+	PRIMARY KEY (id)
+	) ENGINE = INNODB;
+	
+INSERT INTO Customer (first_name, adress, phone, email) VALUES ('wenbou', 'Njombe-Penja Molenkam', '674876946', 'desire@kamet.uni');
+	
+CREATE TABLE db_sdzee_tp.Command (
+	id INT(11) NOT NULL AUTO_INCREMENT,
+	id_customer INT(11),
+	date DATETIME NOT NULL,
+	amount DEC(11) NOT NULL,
+	payment_way VARCHAR(20) NOT NULL,
+	payment_status VARCHAR(20),
+	delivery_way VARCHAR(20) NOT NULL,
+	delivery_status VARCHAR(20),
+	PRIMARY KEY (id),
+	CONSTRAINT fk_id_customer
+		FOREIGN KEY(id_customer)
+		REFERENCES Customer(id)
+		ON DELETE SET NULL
+) ENGINE = INNODB;
