@@ -89,7 +89,7 @@ public class FWIComputation {
      * This method is used as complement of the getLastProfile() method.
      * As there we do not get the last profile but we have launched the process
      * Then we will used this one to complete it from the profileDAOExtDB's implementation.
-     * @param context : This is the context of the MainActivity which has done the request for last profile.
+     * @param context : This is the context of the ComputeActivity which has done the request for last profile.
      * @param profile to recover from the getLastProfile() process.
      */
     public static void setProfile(Context context, Profile  profile){

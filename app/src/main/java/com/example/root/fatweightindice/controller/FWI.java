@@ -2,11 +2,10 @@ package com.example.root.fatweightindice.controller;
 
 import android.content.Context;
 import android.util.Log;
-import android.widget.EditText;
 
 import com.example.root.fatweightindice.bean.Profile;
 import com.example.root.fatweightindice.business.FWIComputation;
-import com.example.root.fatweightindice.view.MainActivity;
+import com.example.root.fatweightindice.view.ComputeActivity;
 
 /**
  * It is very important to note that, the context could not be a field of this class;
@@ -47,7 +46,7 @@ public final class FWI {
     /**
      * This is the method that is going to manage the work inside the controller FWI,
      * as a servlet in a Web App.
-     * @param context : This is the context of the MainActivity
+     * @param context : This is the context of the ComputeActivity
      * @param weight
      * @param size
      * @param age
@@ -56,7 +55,7 @@ public final class FWI {
      */
     public Profile service(Context context, String weight, String size, String age, Boolean sex){
 
-        //MainActivity main = (MainActivity)context;
+        //ComputeActivity main = (ComputeActivity)context;
         // we can use it to access to the layouts
         Log.d("INFO", "****** service "+context.toString()+"********");
         FWIComputation fwiComputation = new FWIComputation(context);
@@ -66,7 +65,7 @@ public final class FWI {
 
     /**
      * This surcharget holds to treat the recovery of the last profile.
-     * @param context : This is the context of the MainActivity
+     * @param context : This is the context of the ComputeActivity
      * @return
      */
     public Profile service(Context context){
@@ -83,7 +82,7 @@ public final class FWI {
      */
     public void setProfile(Context context, Profile profile){
         Log.d("INFO", "****** setProfile : FWI : " +context.toString()+" *********");
-        ((MainActivity)context).setProfile(profile);
+        ((ComputeActivity)context).setProfile(profile);
     }
 
     /**

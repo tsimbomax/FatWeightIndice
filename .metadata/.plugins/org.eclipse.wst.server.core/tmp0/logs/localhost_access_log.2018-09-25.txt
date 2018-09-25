@@ -1,0 +1,11 @@
+127.0.0.1 - - [25/Sep/2018:04:15:27 +0100] "GET / HTTP/1.1" 404 1074
+192.168.1.100 - - [25/Sep/2018:04:21:46 +0100] "POST /WebAppServer/fwi/profile HTTP/1.1" 200 83
+192.168.1.100 - - [25/Sep/2018:05:17:20 +0100] "POST /WebAppServer/fwi/profile HTTP/1.1" 200 83
+192.168.1.100 - - [25/Sep/2018:05:18:10 +0100] "POST /WebAppServer/fwi/profile HTTP/1.1" 200 83
+192.168.1.100 - - [25/Sep/2018:05:18:34 +0100] "POST /WebAppServer/fwi/profile HTTP/1.1" 200 83
+192.168.1.100 - - [25/Sep/2018:05:19:43 +0100] "POST /WebAppServer/fwi/profile HTTP/1.1" 200 83
+192.168.1.100 - - [25/Sep/2018:05:20:33 +0100] "POST /WebAppServer/fwi/profile HTTP/1.1" 200 83
+192.168.1.100 - - [25/Sep/2018:05:49:46 +0100] "POST /WebAppServer/fwi/profile HTTP/1.1" 200 83
+192.168.1.100 - - [25/Sep/2018:05:55:30 +0100] "POST /WebAppServer/fwi/profile HTTP/1.1" 200 83
+192.168.1.100 - - [25/Sep/2018:05:59:01 +0100] "POST /WebAppServer/fwi/profile HTTP/1.1" 200 83
+192.168.1.100 - - [25/Sep/2018:06:05:54 +0100] "POST /WebAppServer/fwi/profile HTTP/1.1" 500 1940

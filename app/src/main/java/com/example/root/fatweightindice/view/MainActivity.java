@@ -1,129 +1,43 @@
 package com.example.root.fatweightindice.view;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.ImageButton;
 
 import com.example.root.fatweightindice.R;
-import com.example.root.fatweightindice.bean.Profile;
-import com.example.root.fatweightindice.controller.FWI;
 
 public class MainActivity extends AppCompatActivity {
 
-    private EditText txtWeight;
-    private EditText txtSize;
-    private EditText txtAge;
-    private RadioButton rbMan;
-    private RadioButton rbWoman;
-    private Button btnCompute;
-    private ImageView imgFWI;
-    private TextView txtComment;
+    private ImageButton btnMenuFWI;
+    private ImageButton btnMenuHistory;
 
-    private FWI fwi = null;
-    private Profile profile = null;
-
+    /**
+     * @see AppCompatActivity#onCreate(Bundle)
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        viewManagement();
+        viewManager();
     }
 
     /**
-     * Main method of the MainActivity.
-     * It manages the different method of its class.
+     * Manage all actions in the Activity
      */
-    private void viewManagement(){
-
-        Log.d("INFO", "The application has been deployed *************");
-
+    private void viewManager(){
         initParam();
-        Log.d("INFO", "The layouts have been mapped in the application**************");
-
-        this.fwi = FWI.getInstance();
-        this.profile = fwi.service(this);
-        Log.d("INFO", "The recovery process held **************");
-        display();
-
-        listenerNewProfile();
+        ViewUtil.listenerButtonMap(btnMenuFWI, this, ComputeActivity.class);
+        //ViewUtil.listenerButtonMap(btnMenuHistory, this, HistoryActivity.class);
     }
 
     /**
-     * This method initialize the layouts.
+     * initialize the parameters.
      */
     private void initParam(){
-
-        txtWeight = (EditText) findViewById(R.id.txtWeight);
-        txtSize = (EditText) findViewById(R.id.txtSize);
-        txtAge = (EditText) findViewById(R.id.txtAge);
-        rbMan = (RadioButton) findViewById(R.id.rbMan);
-        rbWoman = (RadioButton) findViewById(R.id.rbWoman);
-        btnCompute = (Button) findViewById(R.id.btnCompute);
-        imgFWI = (ImageView) findViewById(R.id.imgFWI);
-        txtComment = (TextView) findViewById(R.id.txtComment);
-    }
-
-    /**
-     * This method listeners the click on the F.W.I's computation button.
-     * When the click happen, it create a controller an call the service method.
-     */
-    private void listenerNewProfile(){
-
-        btnCompute.setOnClickListener(new Button.OnClickListener(){
-           public void onClick(View v){
-               Log.d("INFO", "A click happen on the f.w.i computation button*************");
-               MainActivity.this.fwi = FWI.getInstance();
-               MainActivity.this.profile = fwi.service(MainActivity.this,txtWeight.getText().toString(), txtSize.getText().toString(), txtAge.getText().toString(), rbMan.isChecked());
-               display();
-           }
-        });
-    }
-
-    /**
-     * This method set profile from outside and forced its displaying
-     * @param profile to be set and display
-     */
-    public void setProfile(Profile profile){
-        this.profile = profile;
-        display();
-    }
-
-    /**
-     * This method display the result of the computation of the F.W.I and the comment.
-     */
-    private void display(){
-
-        Log.d("INFO", "inside the display method **************");
-        if(profile == null)
-            return;
-
-        txtWeight.setText(profile.getWeight().toString());
-        txtSize.setText(profile.getSize().toString());
-        txtAge.setText(profile.getAge().toString());
-        if(profile.getSex() == 0)
-            rbWoman.setChecked(true);
-
-        String comment = profile.getComment();
-
-        if(comment.equals("Normal")){
-            imgFWI.setImageResource(R.drawable.index1);
-        }else if(comment.equals("Too thin")){
-            imgFWI.setImageResource(R.drawable.index2);
-        } else if(comment.equals("Too fat")){
-            imgFWI.setImageResource(R.drawable.index3);
-        } else{
-            Toast.makeText(this, comment + " please try again!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        txtComment.setText(String.format("%.01f", profile.getFwi()) + " F.W.I " + comment);
-        Log.d("INFO", "A new profile has been compute******************");
+        this.btnMenuFWI = (ImageButton)findViewById(R.id.btnMenuFWI);
+        this.btnMenuHistory = (ImageButton)findViewById(R.id.btnMenuHistory);
     }
 }
