@@ -1,0 +1,135 @@
+package cm.fwi.business;
+
+import java.text.ParseException;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import cm.fwi.beans.Profile;
+import cm.fwi.dao.DAOException;
+import cm.fwi.dao.DAOFactory;
+import cm.fwi.dao.ProfileDao;
+import static cm.fwi.business.DateUtil.*;
+
+/**
+ * 
+ * @author TSIMBO FOKOU
+ * @version 1.0
+ *
+ */
+public class Model extends UtilBus{
+    
+    private static ProfileDao profileDao = null;
+    private static final String LAST_PRO = "profile";
+    private static final String RES = "result";
+    private static final String LIST_PRO = "profiles";
+    private static final String DATA = "data";
+    private static final String FORMAT_PATTERN = "yyyy-MM-dd hh:mm:ss";
+
+    /**
+     * Unique and public constructor
+     * @param daoFactory the unique dao factory, used to get the specification/contract of the profileDao
+     */
+    public Model(DAOFactory daoFactory) {
+        Model.profileDao = daoFactory.getProfileDao();
+    }
+    
+    /**
+     * Save a profile in the storage system specified by profileDao
+     * @param request containing all information to store about a profile.
+     */
+    public void saveProfile(HttpServletRequest request) {
+        
+        JSONArray jsonArray = null;
+        Date date = null ;
+        Integer weight = null ;
+        Integer size = null ;
+        Integer age = null;
+        Integer sex = null ;
+        Float fwi = null ;
+        String comment = null ;
+        try {
+            jsonArray = new JSONArray(request.getParameter( DATA ));
+            
+        } catch ( JSONException e ) {
+            setResult("Fail to open the JSON data; " + e.toString());
+        }
+
+        try {
+            String sdate =  jsonArray.getString( 0 );
+            date = convertStringToDate(sdate, FORMAT_PATTERN);
+            weight = jsonArray.getInt( 1 );
+            size =  jsonArray.getInt( 2 );
+            age =  jsonArray.getInt( 3 );
+            sex = jsonArray.getInt( 4 );
+            fwi = (float)jsonArray.getDouble( 5 );
+            comment = jsonArray.getString( 6 );
+        } catch ( ParseException | JSONException e ) {
+            setResult("error in parameters; " + e.toString());
+            return;
+        }
+                
+        try {
+        Profile profile = new Profile(date, weight, size, age, sex);
+        profile.setFwi(  fwi ) ;
+        profile.setComment( comment );
+        profileDao.createProfile( profile );
+        setResult("profile saves successfully");
+        } catch(DAOException e) {
+            setResult("an error occurs; "+ e.getMessage());
+        }
+    }
+    
+    /**
+     * Get the last store profile from the database system specified by the profileDao
+     * @param request from the client
+     * @return the research profile
+     */
+    public Profile lastProfile(HttpServletRequest request) {
+
+        try {
+            return profileDao.readProfile( 0l );
+        } catch(DAOException e) {
+            setResult("an error occurs; "+ e.getMessage());
+            return null;
+        } finally {
+            if(getResult().isEmpty())
+                setResult("succes");
+        }
+    }
+    
+    /**
+     * Get the list of profiles store in the database.
+     * @param request of the client
+     * @return the list of profiles store in the database
+     */
+    public List<Profile> listProfiles(HttpServletRequest request){
+        
+        try {
+            return profileDao.listOfProfiles();
+        } catch(DAOException e) {
+            setResult("Fail to read the profiles's list from the database; " + e.toString());
+            return null;
+        } finally {
+            if(getResult().isEmpty())
+                setResult("succes");
+        }
+    }
+    
+    public void deleteProfile(String sId) {
+
+        try {
+            long id = Long.parseLong( sId );
+            profileDao.deleteProfile( id );
+        } catch(NumberFormatException e) {
+            
+        } catch(DAOException e) {
+            
+        }
+    }
+}

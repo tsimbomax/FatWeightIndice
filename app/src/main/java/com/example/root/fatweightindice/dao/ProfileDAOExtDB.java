@@ -37,32 +37,41 @@ public class ProfileDAOExtDB implements AsyncResponse, ProfileDAO {
         String message[] = output.split(" % ");
 
         if(message.length>1){
-            if(message[0].equals("saveProfile")){
-                Log.d("SAVE", "*************** " + message[1]);
-            }else if(message[0].equals("lastProfile")){
-                Log.d("LAST", "*************** " + message[1] + message[2]);
-                try {
-                    JSONArray jsonArray = new JSONArray(message[2]);
-                    Profile profile = mapJSONArrayToProfile(jsonArray);
-                    FWIComputation.setProfile(context, profile);
-                } catch (JSONException e) {
-                    throw new DAOException("Fail to open the JSON's data; " + e.toString());
-                }
-            }else if(message[0].equals("listProfiles")){
-                Log.d("LAST", "*************** " + message );
-                try {
-                    JSONArray jsonArray ;
-                    List<Profile> profiles = new ArrayList<Profile>();
-                    int max = message.length;
-                    for(int i=2; i<max; i++){
-                        jsonArray = new JSONArray(message[i]);
-                        profiles.add(mapJSONArrayToProfile(jsonArray));
+
+            switch(message[0]){
+                case "saveProfile" :
+                    Log.d("SAVE", "*************** " + message[1]);
+                    break;
+                case "lastProfile" :
+                    Log.d("LAST", "*************** " + message[1] + message[2]);
+                    try {
+                        JSONArray jsonArray = new JSONArray(message[2]);
+                        Profile profile = mapJSONArrayToProfile(jsonArray);
+                        FWIComputation.setProfile(context, profile);
+                    } catch (JSONException e) {
+                        throw new DAOException("Fail to open the JSON's data; " + e.toString());
                     }
-                } catch (JSONException e) {
-                    throw new DAOException("Fail to open the JSON's data; " + e.toString());
-                }
-            }else if(message[0].equals("error")){
-                Log.d("ERROR", "*************** " + message[1]);
+                    break;
+                case "listProfiles" :
+                    Log.d("LIST", "*************** " + message );
+                    try {
+                        JSONArray jsonArray ;
+                        List<Profile> profiles = new ArrayList<Profile>();
+                        int max = message.length;
+                        for(int i=2; i<max; i++){
+                            jsonArray = new JSONArray(message[i]);
+                            profiles.add(mapJSONArrayToProfile(jsonArray));
+                        }
+                        FWIComputation.setProfiles(profiles);
+                    } catch (JSONException e) {
+                        throw new DAOException("Fail to open the JSON's data; " + e.toString());
+                    }
+                    break;
+                case "deleteProfile" :
+                    Log.d("DEL", "*************** " + message[1] );
+                    break;
+                default:
+                    Log.d("ERROR", "*************** " + message[1]);
             }
         }
         Log.d("INFO-BACK", "**************** processFinish *****************");
@@ -143,6 +152,22 @@ public class ProfileDAOExtDB implements AsyncResponse, ProfileDAO {
 /* we want the top process thread finished before we execute the return instruction*/
         //return this.profiles;
         return null;
+    }
+
+    /**
+     * @see ProfileDAO#deleteProfile(String)
+     * @param date the attribute date of the profile to delete.
+     */
+    @Override
+    public void deleteProfile(String date){
+        Log.d("INFO", "**************** listProfiles *****************");
+        HttpAccess httpAccess = new HttpAccess();
+        httpAccess.setDelegate(this);
+
+        httpAccess.addParam("operation", "deleteProfile");
+        httpAccess.addParam("date", date);
+
+        httpAccess.execute(SERVER_ADR);
     }
 
     /**

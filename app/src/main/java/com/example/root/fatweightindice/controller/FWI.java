@@ -7,6 +7,8 @@ import com.example.root.fatweightindice.bean.Profile;
 import com.example.root.fatweightindice.business.FWIComputation;
 import com.example.root.fatweightindice.view.ComputeActivity;
 
+import java.util.List;
+
 /**
  * It is very important to note that, the context could not be a field of this class;
  * because (as a servlet) it will be instanciated at once, field's context will imply
@@ -20,6 +22,12 @@ import com.example.root.fatweightindice.view.ComputeActivity;
 public final class FWI {
 
     private static FWI fwi = null;
+    /**
+     * This list should be initialize at the application launch from the database,
+     * by its getter. And after it will be update by add() follow by a set().
+     */
+    private List<Profile> profiles = null;
+    private Profile selectedProfile = null;
 
     /**
      * private constructor which make sure that an instance can not be create in every manner.
@@ -34,13 +42,45 @@ public final class FWI {
      */
     public static FWI getInstance(){
 
-        Log.d("INFO", "****** getInstance *********");
+        Log.d("INFO", "****** getInstance *********" );
         if(fwi!=null){
             return fwi;
         } else {
             fwi = new FWI();
             return fwi;
         }
+    }
+
+    /**
+     * Set the list of profiles by initialize them
+     * @param profiles the list of profiles
+     */
+    public void setProfiles(List<Profile> profiles){
+        this.profiles = profiles;
+    }
+
+    /**
+     * Get the current list of profiles
+     * @return the current list of profiles
+     */
+    public List<Profile> getProfiles(){
+        return this.profiles;
+    }
+
+    /**
+     * Get the selected profile from the History activity
+     * @return the selected profile from the history activity
+     */
+    public Profile getSelectedProfile() {
+        return selectedProfile;
+    }
+
+    /**
+     * Set the selected profile from the History activity.
+     * @param selectedProfile
+     */
+    public void setSelectedProfile(Profile selectedProfile) {
+        this.selectedProfile = selectedProfile;
     }
 
     /**
@@ -83,6 +123,23 @@ public final class FWI {
     public void setProfile(Context context, Profile profile){
         Log.d("INFO", "****** setProfile : FWI : " +context.toString()+" *********");
         ((ComputeActivity)context).setProfile(profile);
+    }
+
+    /**
+     * Initialize data from the database.
+     */
+    public void initData(){
+        FWIComputation fwiComputation = new FWIComputation(null);
+        fwiComputation.getListProfiles();
+    }
+
+    /**
+     * Delete a profile from the database and the profile's collections
+     * @param profile the profile to delete;
+     */
+    public void deleteProfile(Profile profile){
+        FWIComputation fwiComputation = new FWIComputation(null);
+        fwiComputation.deleteProfile(profile);
     }
 
     /**

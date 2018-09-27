@@ -19,8 +19,18 @@ public class ViewUtil {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, classe);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 context.startActivity(intent);
             }
         });
+    }
+
+    /**
+     * Format a float into the string pattern "+.?", ie, number which one digit after the point
+     * @param value to format
+     * @return the format string value
+     */
+    public static String decimalFormat(Float value){
+        return String.format("%.01f", value);
     }
 }

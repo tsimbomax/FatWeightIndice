@@ -26,4 +26,10 @@ public interface ProfileDAO {
      * @throws DAOException is generated when an error occurs during the reading in the database.
      */
     public List<Profile> getProfiles() throws DAOException;
+
+    /**
+     * Delete a profile in the database from its data's attribute.
+     * @param date the attribute date of the profile to delete.
+     */
+    public void deleteProfile(String date);
 }

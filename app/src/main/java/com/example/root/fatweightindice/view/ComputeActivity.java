@@ -51,8 +51,14 @@ public class ComputeActivity extends AppCompatActivity {
         Log.d("INFO", "The layouts have been mapped in the application**************");
 
         this.fwi = FWI.getInstance();
-        this.profile = fwi.service(this);
-        Log.d("INFO", "The recovery process held **************");
+        //this.profile = fwi.service(this);
+        //Log.d("INFO", "The recovery process held **************");
+
+        this.profile = fwi.getSelectedProfile();
+        //reset to null of the selectProfile
+        fwi.setSelectedProfile(null);
+        Log.d("INFO", "The transmission profile held **************");
+
         display();
 
         listenerNewProfile();

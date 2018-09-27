@@ -1,9 +1,15 @@
 package com.example.root.fatweightindice.bean;
 
+import android.support.annotation.NonNull;
+
+import com.example.root.fatweightindice.business.DateUtil;
+
+import org.json.JSONArray;
+
 import java.io.Serializable;
 import java.util.Date;
 
-public class Profile implements Serializable{
+public class Profile implements Serializable, Comparable{
 
     private Date date;
     private Integer weight;
@@ -101,4 +107,37 @@ public class Profile implements Serializable{
     public void setComment(String comment) {
         this.comment = comment;
     }
+
+    /**
+     * Convert an instance of Profile into JSONArray
+     * @return the jsonArray data associate to the current profile.
+     */
+    public JSONArray convertProfileToJSONArray(){
+        JSONArray jsonArray = new JSONArray();
+        jsonArray.put(DateUtil.convertDateToString(this.getDate()));
+        jsonArray.put(this.getWeight());
+        jsonArray.put(this.getSize());
+        jsonArray.put(this.getAge());
+        jsonArray.put(this.getSex());
+        jsonArray.put(this.getFwi());
+        jsonArray.put(this.getComment());
+        return jsonArray;
+    }
+
+    /**
+     * Compares this profile with the specified profile for order.  Returns a
+     * negative integer, zero, or a positive integer as this profile.date is less
+     * than, equal to, or greater than the specified profile.date.
+     * @param o the object to be compared.
+     * @return a negative integer, zero, or a positive integer as this object
+     * is less than, equal to, or greater than the specified object.
+     * @throws NullPointerException if the specified object is null
+     * @throws ClassCastException   if the specified object's type prevents it
+     *                              from being compared to this object.
+     */
+    @Override
+    public int compareTo(@NonNull Object profile) {
+        return this.getDate().compareTo(((Profile)profile).getDate());
+    }
+
 }

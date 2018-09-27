@@ -123,4 +123,14 @@ public class ProfileDAOSerialize implements ProfileDAO {
         return null;
     }
 
+    /**
+     * Delete a profile in the serialize' file from its data's attribute.
+     *
+     * @param date the attribute date of the profile to delete.
+     */
+    @Override
+    public void deleteProfile(String date) {
+
+    }
+
 }

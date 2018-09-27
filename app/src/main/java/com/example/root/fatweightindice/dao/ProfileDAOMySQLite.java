@@ -117,6 +117,27 @@ public class ProfileDAOMySQLite implements ProfileDAO {
     }
 
     /**
+     * Delete a profile in the database from its data's attribute.
+     *
+     * @param date the attribute date of the profile to delete.
+     */
+    @Override
+    public void deleteProfile(String date) {
+        Log.d("INFO", "****** deleteProfile ********");
+        try {
+            dbManagement = dbAccess.getWritableDatabase();
+        } catch (SQLiteException e){
+            throw new DAOException(e);
+        }
+        String req = "DELETE FROM Profile WHERE date="+date+";";
+        try {
+            dbManagement.execSQL(req);
+        } catch (SQLException e){
+            throw new DAOException("fail to save a new profile in the database", e);
+        }
+    }
+
+    /**
      * Map the actual data of the cursor into a profile
      * @param cursor at a readable position
      * @return the associate profile of cursor at its position

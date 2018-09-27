@@ -25,6 +25,7 @@ public class FWIComputation {
     private Context context;
     private DAOFactory daoFactory;
 
+
     /**
      * Unique and public constructor
      */
@@ -61,7 +62,10 @@ public class FWIComputation {
         } catch (DAOException e){
             e.printStackTrace();
         }
-
+        FWI fwi = FWI.getInstance();
+        List<Profile> profiles = fwi.getProfiles();
+        profiles.add(profile);
+        //fwi.setProfiles(profiles);//useless from the nature of value transmission/return in java (Reference).
         return profile;
     }
 
@@ -101,16 +105,43 @@ public class FWIComputation {
 
     /**
      *Ask all instances of Profile in the database to the DAO
-     * @return the list of profiles
+     * @return the list of profiles, here it will be null.
      */
     public List<Profile> getListProfiles(){
         Log.d("INFO", "****** getListProfiles ********");
-        List<Profile> profiles = new ArrayList<Profile>();
-        for (Profile profile : profiles) {
-            computeFWI(profile);
-            interprateFWI(profile);
-        }
+        List<Profile> profiles = null;
+        ProfileDAO profileDAO = daoFactory.getProfileDAO(null);
+            profiles = profileDAO.getProfiles();
         return profiles;
+    }
+
+    /**
+     * This method is used as complement of the getListProfile() method.
+     * As that level, we do not get the list of profiles but we have launched the process
+     * Then we will used this one to complete it from the profileDAOExtDB's implementation.
+     * @param profiles to recover from the getListProfiles() process.
+     */
+    public static void setProfiles(List<Profile>  profiles){
+        // We put null for the context because the unique FWI instance has already been created
+        // and then contains the right context.
+        FWI fwi = FWI.getInstance();
+        fwi.setProfiles(profiles);
+    }
+
+    /**
+     * Delete a profile from the profile's collection and the database.
+     * @param profile the profile to delete
+     */
+    public void deleteProfile(Profile profile){
+
+        ProfileDAO profileDAO = daoFactory.getProfileDAO(null);
+        try{
+            profileDAO.deleteProfile(DateUtil.convertDateToString(profile.getDate()));
+            FWI fwi = FWI.getInstance();
+            fwi.getProfiles().remove(profile);
+        } catch(DAOException e){
+            Log.e("ERROR", " **** " + e.toString() + " *********");
+        }
     }
 
     /**

@@ -26,6 +26,7 @@ public class Controller extends HttpServlet {
     
     private static final String CONF_DAO_FACTORY = "daofactory";
     private static final String OPERATION = "operation";
+    private static final String DATE = "date";
     
     private Model model = null;
     
@@ -63,45 +64,57 @@ public class Controller extends HttpServlet {
         response.setContentType( "text" );
         PrintWriter out = response.getWriter();
 	    
-	    if("saveProfile".equals( operation )) {
-	        model.saveProfile(request);
-	        out.print(operation + " % " + model.getResult());
-	    }else if("lastProfile".equals( operation )) {
-	        Profile profile = model.lastProfile(request);
-	        if(profile != null) {
-	            JSONArray jsonArray = new JSONArray();
-	            jsonArray.put(profile.getDte());
-	            jsonArray.put(profile.getWeight());
-	            jsonArray.put(profile.getSize());
-	            jsonArray.put(profile.getAge());
-	            jsonArray.put(profile.getSex());
-	            jsonArray.put(profile.getFwi());
-	            jsonArray.put(profile.getComment());
-
-	            out.print(operation + " % " + model.getResult() + " % "+ jsonArray);
-	        } else {
-	            out.print(operation + " % " + model.getResult() + " % " + null);
-	        }
-	    } else if("listProfiles".equals( operation )) {
-	        List<Profile> profiles = model.listProfiles(request);
-	        out.print( operation + " % " + model.getResult());
-	        if(profiles == null)
-	            return;
-	        JSONArray jsonArray = new JSONArray();
-	        for(Profile profile : profiles) {
-	            jsonArray.put(profile.getDte());
-                jsonArray.put(profile.getWeight());
-                jsonArray.put(profile.getSize());
-                jsonArray.put(profile.getAge());
-                jsonArray.put(profile.getSex());
-                jsonArray.put(profile.getFwi());
-                jsonArray.put(profile.getComment());
-
-                out.print(" % " + jsonArray);
-                for(int i=jsonArray.length()-1; i>=0; i--)
-                    jsonArray.remove( i );
-	        }
-	    }
+        switch(operation) {
+            case "saveProfile" : 
+                model.saveProfile(request);
+    	        out.print(operation + " % " + model.getResult());
+                break;
+            case "lastProfile" :
+                Profile profile = model.lastProfile(request);
+    	        if(profile != null) {
+    	            JSONArray jsonArray = new JSONArray();
+    	            jsonArray.put(profile.getDte());
+    	            jsonArray.put(profile.getWeight());
+    	            jsonArray.put(profile.getSize());
+    	            jsonArray.put(profile.getAge());
+    	            jsonArray.put(profile.getSex());
+    	            jsonArray.put(profile.getFwi());
+    	            jsonArray.put(profile.getComment());
+    
+    	            out.print(operation + " % " + model.getResult() + " % "+ jsonArray);
+    	        } else {
+    	            out.print(operation + " % " + model.getResult() + " % " + null);
+    	        }
+                break;
+            case "listProfiles" :
+                List<Profile> profiles = model.listProfiles(request);
+    	        out.print( operation + " % " + model.getResult());
+    	        if(profiles == null)
+    	            return;
+    	        JSONArray jsonArray = new JSONArray();
+    	        for( Profile profile1 : profiles) {
+    	            jsonArray.put(profile1.getDte());
+                    jsonArray.put(profile1.getWeight());
+                    jsonArray.put(profile1.getSize());
+                    jsonArray.put(profile1.getAge());
+                    jsonArray.put(profile1.getSex());
+                    jsonArray.put(profile1.getFwi());
+                    jsonArray.put(profile1.getComment());
+    
+                    out.print(" % " + jsonArray);
+                    for(int i=jsonArray.length()-1; i>=0; i--)
+                        jsonArray.remove( i );
+    	        }
+                break;
+            case "deleteProfile" :
+                String date = request.getParameter( DATE );
+                model.deleteProfile( date );
+                out.print( operation + " % " + model.getResult() );
+                break;
+            default : 
+                out.print( operation  + " % Operation '" + operation +"' is not defined." );
+                break;
+            }
 	}
 
 }

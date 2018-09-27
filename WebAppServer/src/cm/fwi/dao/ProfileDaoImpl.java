@@ -21,7 +21,7 @@ public class ProfileDaoImpl implements ProfileDao {
     private static final String SQL_QUERY_CREATE_PROF = "INSERT INTO Profile (dte, weight, size, age, sex, fwi, comment) VALUES (?, ?, ?, ?, ?, ?, ?)";
     private static final String SQL_QUERY_READ_PROF   = "SELECT * FROM Profile WHERE id=(SELECT MAX(id) FROM Profile)";
     private static final String SQL_QUERY_LIST_PROF   = "SELECT * FROM Profile";
-    private static final String SQL_QUERY_DEL_PROF    = "DELETE FROM Profile WHERE id=?";
+    private static final String SQL_QUERY_DEL_PROF    = "DELETE FROM Profile WHERE dte=?";
     private static final String FORMAT_PATTERN = "yyyy-MM-dd hh:mm:ss";
 
     private DAOFactory          daoFactory;
@@ -131,7 +131,7 @@ public class ProfileDaoImpl implements ProfileDao {
      * @see ProfileDao#deleteProfile(Long)
      */
     @Override
-    public void deleteProfile( Long id ) throws DAOException, PoolException{
+    public void deleteProfile( String date) throws DAOException, PoolException{
 
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -139,7 +139,7 @@ public class ProfileDaoImpl implements ProfileDao {
 
         try {
             connection = daoFactory.getConnection();
-            preparedStatement = initPreparedStatement( connection, SQL_QUERY_DEL_PROF, false, id );
+            preparedStatement = initPreparedStatement( connection, SQL_QUERY_DEL_PROF, false, date );
             status = preparedStatement.executeUpdate();
             if ( status == 0 ) {
                 throw new DAOException( "Fail to delete a Profile from the database." );

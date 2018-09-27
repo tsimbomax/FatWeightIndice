@@ -33,5 +33,5 @@ public interface ProfileDao {
      * @param id of the profile to delete
      * @throws DAOException
      */
-    void deleteProfile( Long id ) throws DAOException;
+    void deleteProfile( String date) throws DAOException;
 }

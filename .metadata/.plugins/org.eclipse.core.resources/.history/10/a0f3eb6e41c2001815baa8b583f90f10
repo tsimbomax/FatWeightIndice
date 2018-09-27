@@ -1,0 +1,120 @@
+package cm.fwi.servlets;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.json.JSONArray;
+
+import cm.fwi.beans.Profile;
+import cm.fwi.business.Model;
+import cm.fwi.dao.DAOFactory;
+
+/**
+ * @author TSIMBO FOKOU
+ * @version 1.0
+ * Servlet implementation class Controller
+ */
+@WebServlet("/fwi/profile")
+public class Controller extends HttpServlet {
+    
+    private static final String CONF_DAO_FACTORY = "daofactory";
+    private static final String OPERATION = "operation";
+    private static final String ID = "id";
+    
+    private Model model = null;
+    
+    public void init() {
+        
+        this.model = new Model((DAOFactory)getServletContext().getAttribute( CONF_DAO_FACTORY ));
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+	    controle(request, response);
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	    controle(request, response);
+	}
+	
+	/**
+	 * The service method. it will treat the request independenly of its type ie. post or get.
+	 * @param request from the client
+	 * @param response initial response to send to the client
+	 * @throws IOException when output encount an error
+	 */
+	public void controle(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	    
+	    String operation = request.getParameter( OPERATION );
+	    
+	    response.addHeader( "result", model.getResult() );
+        response.setContentType( "text" );
+        PrintWriter out = response.getWriter();
+	    
+        switch(operation) {
+            case "saveProfile" : 
+                model.saveProfile(request);
+    	        out.print(operation + " % " + model.getResult());
+                break;
+            case "lastProfile" :
+                Profile profile = model.lastProfile(request);
+    	        if(profile != null) {
+    	            JSONArray jsonArray = new JSONArray();
+    	            jsonArray.put(profile.getDte());
+    	            jsonArray.put(profile.getWeight());
+    	            jsonArray.put(profile.getSize());
+    	            jsonArray.put(profile.getAge());
+    	            jsonArray.put(profile.getSex());
+    	            jsonArray.put(profile.getFwi());
+    	            jsonArray.put(profile.getComment());
+    
+    	            out.print(operation + " % " + model.getResult() + " % "+ jsonArray);
+    	        } else {
+    	            out.print(operation + " % " + model.getResult() + " % " + null);
+    	        }
+                break;
+            case "listProfiles" :
+                List<Profile> profiles = model.listProfiles(request);
+    	        out.print( operation + " % " + model.getResult());
+    	        if(profiles == null)
+    	            return;
+    	        JSONArray jsonArray = new JSONArray();
+    	        for( Profile profile1 : profiles) {
+    	            jsonArray.put(profile1.getDte());
+                    jsonArray.put(profile1.getWeight());
+                    jsonArray.put(profile1.getSize());
+                    jsonArray.put(profile1.getAge());
+                    jsonArray.put(profile1.getSex());
+                    jsonArray.put(profile1.getFwi());
+                    jsonArray.put(profile1.getComment());
+    
+                    out.print(" % " + jsonArray);
+                    for(int i=jsonArray.length()-1; i>=0; i--)
+                        jsonArray.remove( i );
+    	        }
+                break;
+            case "deleteProfile" :
+                String sId = request.getParameter( ID );
+                model.deleteProfile( sId );
+                out.print( operation + " % " + model.getResult() );
+                break;
+            default : 
+                out.print( operation  + " % Operation '" + operation +"' is not defined." );
+                break;
+            }
+	}
+
+}
